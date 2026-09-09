@@ -1,0 +1,100 @@
+project:
+  title: "OKC METAL WEEKLY"
+  tagline: "YOUR WEEKLY GUIDE TO HEAVY MUSIC IN OKC"
+
+schedule:
+  # 0=Mon ... 4=Fri ... 6=Sun
+  week_start_weekday: 4
+  week_length_days: 10
+  # Before Friday, generate the upcoming Fri-Thu edition.
+  upcoming_before_start_day: true
+
+canvas:
+  width: 1080
+  height: 1350
+
+theme:
+  active: "hazard_orange"
+
+  palettes:
+    hazard_orange:
+      background: "#0A0A0A"
+      paper: "#EEECE5"
+      accent: "#FF5A1F"
+      muted: "#969696"
+
+    blood_red:
+      background: "#090909"
+      paper: "#F0EDE6"
+      accent: "#E31B23"
+      muted: "#969696"
+
+    electric_blue:
+      background: "#080A0C"
+      paper: "#EEF2F4"
+      accent: "#00B8E6"
+      muted: "#8E989E"
+
+    ultraviolet:
+      background: "#09080B"
+      paper: "#F0EDF2"
+      accent: "#A45CFF"
+      muted: "#98909D"
+
+typography:
+  # Put downloaded font files in static/fonts and enter the filenames here.
+  # Example: display_file: "Ashborn.ttf"
+  display_file: "Hellshunx.ttf"
+  condensed_file: ""
+  body_file: ""
+
+  display_fallback: "Impact, 'Arial Black', sans-serif"
+  condensed_fallback: "'DejaVu Sans Condensed', 'Arial Narrow', sans-serif"
+  body_fallback: "'DejaVu Sans Condensed', Arial, sans-serif"
+
+images:
+  # Put your OKC image in static/images and set the filename here.
+  okc_background: "okc_skyline.jpg"
+  okc_background_opacity: 0.3
+  # More flyer/photocopy-like image treatment.
+  okc_grayscale: 1.0
+  okc_contrast: 1.25
+  okc_brightness: 0.48
+  okc_saturation: 0.0
+
+effects:
+  # These are deliberately subtle. Set enabled: false to disable any effect.
+  grain:
+    enabled: true
+    opacity: 0.045
+    scale_px: 220
+
+  static:
+    enabled: true
+    opacity: 0.022
+    line_spacing_px: 17
+
+  vignette:
+    enabled: true
+    opacity: 0.22
+
+  rough_rules:
+    enabled: true
+    jitter_px: 2
+
+  rotations:
+    enabled: true
+    week_stamp_deg: 1.2
+    kicker_deg: -0.45
+    support_stamp_deg: -1.1
+
+  release_watermark:
+    enabled: true
+    opacity: 0.05
+
+layout:
+  # Show slide uses dynamic font sizing based on estimated wrapped lines.
+  show_min_font_px: 25
+  show_max_font_px: 36
+  release_min_font_px: 25
+  release_max_font_px: 34
