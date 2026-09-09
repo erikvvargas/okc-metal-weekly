@@ -1,0 +1,53 @@
+name: Generate OKC Metal Weekly
+
+on:
+  workflow_dispatch:
+    inputs:
+      start_date:
+        description: "Start date (YYYY-MM-DD)"
+        required: true
+        type: string
+
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install Python dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Install Chromium
+        run: |
+          playwright install --with-deps chromium
+
+      - name: Create Google credentials
+        env:
+          GOOGLE_SERVICE_ACCOUNT: ${{ secrets.GOOGLE_SERVICE_ACCOUNT }}
+        run: |
+          printf '%s' "$GOOGLE_SERVICE_ACCOUNT" > service-account.json
+
+      - name: Generate Instagram slides
+        env:
+          GOOGLE_SHEET_ID: ${{ secrets.GOOGLE_SHEET_ID }}
+        run: |
+          python generate.py \
+            --sheet-id "$GOOGLE_SHEET_ID" \
+            --credentials service-account.json \
+            --week "${{ inputs.start_date }}"
+
+      - name: Upload generated slides
+        uses: actions/upload-artifact@v4
+        with:
+          name: okc-metal-weekly-${{ inputs.start_date }}
+          path: output/
+          if-no-files-found: error
