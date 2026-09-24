@@ -5,7 +5,7 @@ project:
 schedule:
   # 0=Mon ... 4=Fri ... 6=Sun
   week_start_weekday: 4
-  week_length_days: 10
+  week_length_days: 11
   # Before Friday, generate the upcoming Fri-Thu edition.
   upcoming_before_start_day: true
 
