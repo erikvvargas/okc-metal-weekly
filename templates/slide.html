@@ -170,6 +170,9 @@
   }
 
   .week {
+    position: relative;
+    top: 24px;
+    right: 30px;
     border: 3px solid var(--accent);
     padding: 10px 14px 9px;
     min-width: 170px;
@@ -245,9 +248,17 @@
     text-transform: uppercase;
   }
 
+  .event-meta {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-top: 5px;
+      flex-wrap: nowrap;
+  }
+
   .venue {
     display: inline-block;
-    margin-top: 5px;
+    margin-top: 0;
     padding: 3px 7px 2px;
     color: var(--bg);
     background: var(--paper);
@@ -256,6 +267,30 @@
     font-weight: 900;
     line-height: 1;
     text-transform: uppercase;
+  }
+
+  .notation {
+    display: inline-block;
+    padding: 3px 9px 2px;
+
+    color: var(--accent);
+    border: 2px solid var(--accent);
+    background: color-mix(in srgb, var(--bg) 88%, transparent);
+
+    font-family: {% if font_files.condensed %}"OMW Condensed",{% endif %} {{ typography.condensed_fallback }};
+    font-size: {{ show_venue_font_px }}px;
+    font-weight: 900;
+    line-height: 1;
+    letter-spacing: .5px;
+    text-transform: uppercase;
+
+    transform: rotate(-3deg);
+    transform-origin: left center;
+
+    white-space: nowrap;
+    max-width: 330px;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 
   /* ---------- RELEASES ---------- */
@@ -440,7 +475,14 @@
               {% for item in group.events %}
                 <div class="event">
                   <div class="bands">{{ item.bands_display }}</div>
-                  <div class="venue">@ {{ item.venue }}</div>
+
+                  <div class="event-meta">
+                    <div class="venue">@ {{ item.venue }}</div>
+
+                    {% if item.notation %}
+                      <div class="notation">{{ item.notation }}</div>
+                    {% endif %}
+                  </div>
                 </div>
               {% endfor %}
             </div>

@@ -90,9 +90,15 @@ def prep_shows(df):
         events = []
         for _, row in day_df.iterrows():
             bands = [x.strip() for x in str(row["bands"]).split("|") if x.strip()]
+            notation = ""
+
+            if "Notations" in row.index and pd.notna(row["Notations"]):
+                notation = str(row["Notations"]).strip()
+
             events.append({
                 "venue": str(row["venue"]).strip(),
                 "bands_display": " • ".join(bands),
+                "notation": notation,
             })
 
         groups.append({
