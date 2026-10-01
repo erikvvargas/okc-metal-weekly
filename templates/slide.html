@@ -2,6 +2,7 @@
 <html>
 <head>
 <meta charset="utf-8">
+
 <style>
   {% if font_files.display %}
   @font-face {
@@ -12,6 +13,7 @@
     font-display: block;
   }
   {% endif %}
+
   {% if font_files.condensed %}
   @font-face {
     font-family: "OMW Condensed";
@@ -20,6 +22,7 @@
     font-display: block;
   }
   {% endif %}
+
   {% if font_files.body %}
   @font-face {
     font-family: "OMW Body";
@@ -28,6 +31,7 @@
   }
   {% endif %}
 
+
   :root {
     --bg: {{ colors.background }};
     --paper: {{ colors.paper }};
@@ -35,8 +39,14 @@
     --muted: {{ colors.muted }};
   }
 
-  * { box-sizing: border-box; }
-  html, body {
+
+  * {
+    box-sizing: border-box;
+  }
+
+
+  html,
+  body {
     width: {{ canvas.width }}px;
     height: {{ canvas.height }}px;
     margin: 0;
@@ -44,10 +54,17 @@
     background: var(--bg);
   }
 
+
   body {
-    font-family: {% if font_files.body %}"OMW Body",{% endif %} {{ typography.body_fallback }};
+    font-family:
+      {% if font_files.body %}
+      "OMW Body",
+      {% endif %}
+      {{ typography.body_fallback }};
+
     color: var(--paper);
   }
+
 
   .slide {
     width: 100%;
@@ -55,66 +72,112 @@
     position: relative;
     isolation: isolate;
     overflow: hidden;
+
     padding: 60px 68px 48px;
+
     background:
-      radial-gradient(circle at 12% 4%, rgba(255,255,255,.055), transparent 28%),
-      radial-gradient(circle at 90% 84%, rgba(255,255,255,.03), transparent 31%),
-      linear-gradient(117deg, rgba(255,255,255,.018), transparent 34%, rgba(255,255,255,.012) 68%, transparent),
+      radial-gradient(
+        circle at 12% 4%,
+        rgba(255,255,255,.055),
+        transparent 28%
+      ),
+      radial-gradient(
+        circle at 90% 84%,
+        rgba(255,255,255,.03),
+        transparent 31%
+      ),
+      linear-gradient(
+        117deg,
+        rgba(255,255,255,.018),
+        transparent 34%,
+        rgba(255,255,255,.012) 68%,
+        transparent
+      ),
       var(--bg);
   }
 
-  /* Optional OKC photograph. High contrast + darkening makes it feel more
-     like a xerox/printed flyer than a normal photo. */
+
+  /* =========================================================
+     OPTIONAL OKC BACKGROUND
+     ========================================================= */
+
   {% if background_image %}
   .slide.has-bg::before {
     content: "";
     position: absolute;
     inset: -12px;
+
     background-image:
-      linear-gradient(rgba(0,0,0,.24), rgba(0,0,0,.68)),
+      linear-gradient(
+        rgba(0,0,0,.24),
+        rgba(0,0,0,.68)
+      ),
       url("{{ background_image }}");
+
     background-position: right;
     background-size: cover;
-    opacity: {{ images.okc_background_opacity }};
+
+    opacity:
+      {{ images.okc_background_opacity }};
+
     filter:
       grayscale({{ images.okc_grayscale }})
       contrast({{ images.okc_contrast }})
       brightness({{ images.okc_brightness }})
       saturate({{ images.okc_saturation }});
+
     transform: scale(1.025);
     z-index: -5;
   }
   {% endif %}
 
-  /* Broad paper/grain texture generated entirely in CSS. */
+
+  /* =========================================================
+     TEXTURE
+     ========================================================= */
+
   {% if effects.grain.enabled %}
   .grain {
     position: absolute;
     inset: -40px;
     z-index: 50;
+
     pointer-events: none;
-    opacity: {{ effects.grain.opacity }};
+
+    opacity:
+      {{ effects.grain.opacity }};
+
     mix-blend-mode: screen;
-    background-size: {{ effects.grain.scale_px }}px {{ effects.grain.scale_px }}px;
+
+    background-size:
+      {{ effects.grain.scale_px }}px
+      {{ effects.grain.scale_px }}px;
+
     background-image:
       url("data:image/svg+xml,%3Csvg viewBox='0 0 220 220' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.82' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.72'/%3E%3C/svg%3E");
   }
   {% endif %}
 
-  /* Tiny horizontal static/screen texture. */
+
   {% if effects.static.enabled %}
   .static {
     position: absolute;
     inset: 0;
     z-index: 51;
+
     pointer-events: none;
-    opacity: {{ effects.static.opacity }};
+
+    opacity:
+      {{ effects.static.opacity }};
+
     mix-blend-mode: screen;
+
     background-image:
       repeating-linear-gradient(
         0deg,
         rgba(255,255,255,.45) 0 1px,
-        transparent 1px {{ effects.static.line_spacing_px }}px
+        transparent 1px
+        {{ effects.static.line_spacing_px }}px
       ),
       repeating-linear-gradient(
         91deg,
@@ -124,18 +187,35 @@
   }
   {% endif %}
 
+
   {% if effects.vignette.enabled %}
   .vignette {
     position: absolute;
     inset: 0;
     z-index: 49;
+
     pointer-events: none;
-    opacity: {{ effects.vignette.opacity }};
-    box-shadow: inset 0 0 170px 40px rgba(0,0,0,.9);
+
+    opacity:
+      {{ effects.vignette.opacity }};
+
+    box-shadow:
+      inset 0 0 170px 40px
+      rgba(0,0,0,.9);
   }
   {% endif %}
 
-  .content { position: relative; z-index: 2; height: 100%; }
+
+  .content {
+    position: relative;
+    z-index: 2;
+    height: 100%;
+  }
+
+
+  /* =========================================================
+     HEADER
+     ========================================================= */
 
   .topline {
     display: flex;
@@ -144,398 +224,959 @@
     gap: 28px;
   }
 
+
   .kicker {
     display: inline-block;
+
     color: var(--accent);
-    font-family: {% if font_files.condensed %}"OMW Condensed",{% endif %} {{ typography.condensed_fallback }};
+
+    font-family:
+      {% if font_files.condensed %}
+      "OMW Condensed",
+      {% endif %}
+      {{ typography.condensed_fallback }};
+
     font-size: 46px;
     font-style: italic;
     font-weight: 900;
     letter-spacing: .8px;
     line-height: .95;
+
     text-transform: uppercase;
-    {% if effects.rotations.enabled %}transform: rotate({{ effects.rotations.kicker_deg }}deg);{% endif %}
+
+    {% if effects.rotations.enabled %}
+    transform:
+      rotate(
+        {{ effects.rotations.kicker_deg }}deg
+      );
+    {% endif %}
+
     transform-origin: left center;
   }
 
+
   h1 {
     margin: 8px 0 0;
-    font-family: {% if font_files.display %}"OMW Display",{% endif %} {{ typography.display_fallback }};
+
+    font-family:
+      {% if font_files.display %}
+      "OMW Display",
+      {% endif %}
+      {{ typography.display_fallback }};
+
     font-size: 100px;
     font-weight: normal;
     letter-spacing: -1px;
     line-height: .84;
+
     text-transform: uppercase;
-    text-shadow: 1px 1px 0 rgba(255,255,255,.08), -1px 0 0 rgba(0,0,0,.5);
+
+    text-shadow:
+      1px 1px 0 rgba(255,255,255,.08),
+      -1px 0 0 rgba(0,0,0,.5);
   }
 
+
+  /*
+    Date badge intentionally moved down and left
+    to provide additional Instagram-safe space.
+  */
   .week {
     position: relative;
+
     top: 24px;
     right: 30px;
-    border: 3px solid var(--accent);
-    padding: 10px 14px 9px;
+
+    flex: 0 0 auto;
+
+    border:
+      3px solid var(--accent);
+
+    padding:
+      10px 14px 9px;
+
     min-width: 170px;
-    background: color-mix(in srgb, var(--bg) 80%, transparent);
-    box-shadow: 4px 4px 0 color-mix(in srgb, var(--accent) 45%, transparent);
-    font-family: {% if font_files.condensed %}"OMW Condensed",{% endif %} {{ typography.condensed_fallback }};
+
+    background:
+      color-mix(
+        in srgb,
+        var(--bg) 80%,
+        transparent
+      );
+
+    box-shadow:
+      4px 4px 0
+      color-mix(
+        in srgb,
+        var(--accent) 45%,
+        transparent
+      );
+
+    font-family:
+      {% if font_files.condensed %}
+      "OMW Condensed",
+      {% endif %}
+      {{ typography.condensed_fallback }};
+
     font-size: 28px;
     font-weight: 900;
     line-height: 1.04;
+
     text-align: center;
     text-transform: uppercase;
-    {% if effects.rotations.enabled %}transform: rotate({{ effects.rotations.week_stamp_deg }}deg);{% endif %}
+
+    {% if effects.rotations.enabled %}
+    transform:
+      rotate(
+        {{ effects.rotations.week_stamp_deg }}deg
+      );
+    {% endif %}
   }
 
-  /* Rough-looking accent rule: solid base plus small broken overlays. */
+
+  /* =========================================================
+     ACCENT RULE
+     ========================================================= */
+
   .rule {
     position: relative;
+
     height: 7px;
-    margin: 32px 0 24px;
-    background: var(--accent);
-    transform: skewX(-8deg);
+
+    margin:
+      32px 0 24px;
+
+    background:
+      var(--accent);
+
+    transform:
+      skewX(-8deg);
+
     overflow: hidden;
   }
+
+
   {% if effects.rough_rules.enabled %}
   .rule::after {
     content: "";
+
     position: absolute;
     inset: 1px -12px;
-    background: repeating-linear-gradient(
-      91deg,
-      transparent 0 14px,
-      rgba(0,0,0,.85) 14px 17px,
-      transparent 17px 37px
-    );
-    transform: translateX({{ effects.rough_rules.jitter_px }}px);
+
+    background:
+      repeating-linear-gradient(
+        91deg,
+        transparent 0 14px,
+        rgba(0,0,0,.85) 14px 17px,
+        transparent 17px 37px
+      );
+
+    transform:
+      translateX(
+        {{ effects.rough_rules.jitter_px }}px
+      );
   }
   {% endif %}
 
-  /* ---------- SHOWS ---------- */
+
+  /* =========================================================
+     SHOWS
+     ========================================================= */
 
   .day-group {
     display: grid;
-    grid-template-columns: 132px 1fr;
+
+    grid-template-columns:
+      132px 1fr;
+
     gap: 18px;
-    padding: 12px 0 14px;
-    border-bottom: 1px solid color-mix(in srgb, var(--accent) 42%, transparent);
+
+    padding:
+      12px 0 14px;
+
+    border-bottom:
+      1px solid
+      color-mix(
+        in srgb,
+        var(--accent) 42%,
+        transparent
+      );
   }
+
 
   .day-group:nth-child(even) .date {
-    transform: translateX(5px);
+    transform:
+      translateX(5px);
   }
 
+
   .date {
-    color: var(--accent);
-    font-family: {% if font_files.condensed %}"OMW Condensed",{% endif %} {{ typography.condensed_fallback }};
+    color:
+      var(--accent);
+
+    font-family:
+      {% if font_files.condensed %}
+      "OMW Condensed",
+      {% endif %}
+      {{ typography.condensed_fallback }};
+
     font-size: 31px;
     font-weight: 900;
     line-height: .96;
+
     text-transform: uppercase;
   }
 
+
+  /*
+    Additional separation between multiple shows
+    occurring on the same date.
+  */
   .event + .event {
-    margin-top: 12px;
-    padding-top: 11px;
-    border-top: 1px dashed rgba(238,236,229,.24);
+    margin-top: 14px;
+    padding-top: 13px;
+
+    border-top:
+      1px dashed
+      rgba(238,236,229,.24);
   }
+
 
   .bands {
-    font-family: {% if font_files.condensed %}"OMW Condensed",{% endif %} {{ typography.condensed_fallback }};
-    font-size: {{ show_font_px }}px;
+    font-family:
+      {% if font_files.condensed %}
+      "OMW Condensed",
+      {% endif %}
+      {{ typography.condensed_fallback }};
+
+    font-size:
+      {{ show_font_px }}px;
+
     font-weight: 900;
     line-height: 1.03;
+
     text-transform: uppercase;
   }
 
+
+  /*
+    Venue + optional notation.
+
+    flex-wrap lets the notation move underneath
+    the venue when there isn't enough horizontal
+    room.
+  */
   .event-meta {
-      display: flex;
-      align-items: center;
-      gap: 7px 10px;
-      margin-top: 5px;
-      flex-wrap: wrap;
+    display: flex;
+
+    align-items: center;
+
+    gap:
+      8px 12px;
+
+    margin-top: 8px;
+
+    flex-wrap: wrap;
+
+    min-height:
+      calc(
+        {{ show_venue_font_px }}px + 10px
+      );
   }
+
 
   .venue {
+    flex: 0 0 auto;
+
     display: inline-block;
-    margin-top: 0;
-    padding: 3px 7px 2px;
-    color: var(--bg);
-    background: var(--paper);
-    font-family: {% if font_files.condensed %}"OMW Condensed",{% endif %} {{ typography.condensed_fallback }};
-    font-size: {{ show_venue_font_px }}px;
+
+    padding:
+      3px 7px 2px;
+
+    color:
+      var(--bg);
+
+    background:
+      var(--paper);
+
+    font-family:
+      {% if font_files.condensed %}
+      "OMW Condensed",
+      {% endif %}
+      {{ typography.condensed_fallback }};
+
+    font-size:
+      {{ show_venue_font_px }}px;
+
     font-weight: 900;
     line-height: 1;
+
     text-transform: uppercase;
+
+    white-space: nowrap;
   }
+
+
+  /*
+    This wrapper stays unrotated.
+
+    That gives flexbox a clean rectangular area
+    to reserve for the notation. The visual
+    rotation occurs only on the child.
+  */
+  .notation-wrap {
+    flex: 0 0 auto;
+
+    display: inline-block;
+
+    padding: 3px;
+  }
+
 
   .notation {
     display: inline-block;
-    padding: 3px 9px 2px;
 
-    color: var(--accent);
-    border: 2px solid var(--accent);
-    background: color-mix(in srgb, var(--bg) 88%, transparent);
+    padding:
+      3px 9px 2px;
 
-    font-family: {% if font_files.condensed %}"OMW Condensed",{% endif %} {{ typography.condensed_fallback }};
-    font-size: {{ show_venue_font_px }}px;
+    color:
+      var(--accent);
+
+    border:
+      2px solid var(--accent);
+
+    background:
+      color-mix(
+        in srgb,
+        var(--bg) 92%,
+        transparent
+      );
+
+    font-family:
+      {% if font_files.condensed %}
+      "OMW Condensed",
+      {% endif %}
+      {{ typography.condensed_fallback }};
+
+    font-size:
+      {{ show_venue_font_px }}px;
+
     font-weight: 900;
     line-height: 1;
     letter-spacing: .5px;
+
     text-transform: uppercase;
 
-    transform: rotate(-3deg);
-    transform-origin: left center;
-
     white-space: nowrap;
-    max-width: 330px;
+
+    /*
+      Slightly less aggressive than the original
+      -3deg rotation. Still gives it the flyer
+      stamp effect without rising as far into the
+      band names above.
+    */
+    transform:
+      rotate(-2deg);
+
+    transform-origin:
+      center;
   }
 
-  /* ---------- RELEASES ---------- */
 
-  .release-wrap { position: relative; }
+  /* =========================================================
+     RELEASES
+     ========================================================= */
+
+  .release-wrap {
+    position: relative;
+  }
+
 
   {% if effects.release_watermark.enabled %}
   .release-watermark {
     position: absolute;
+
     right: -24px;
     top: 22px;
+
     z-index: -1;
-    font-family: {% if font_files.display %}"OMW Display",{% endif %} {{ typography.display_fallback }};
+
+    font-family:
+      {% if font_files.display %}
+      "OMW Display",
+      {% endif %}
+      {{ typography.display_fallback }};
+
     font-size: 430px;
     font-weight: 900;
     line-height: .75;
-    color: var(--paper);
-    opacity: {{ effects.release_watermark.opacity }};
-    transform: rotate(-5deg);
+
+    color:
+      var(--paper);
+
+    opacity:
+      {{ effects.release_watermark.opacity }};
+
+    transform:
+      rotate(-5deg);
+
     user-select: none;
   }
   {% endif %}
 
+
   .release-grid {
     display: grid;
-    grid-template-columns: repeat({{ release_columns }}, minmax(0, 1fr));
+
+    grid-template-columns:
+      repeat(
+        {{ release_columns }},
+        minmax(0, 1fr)
+      );
+
     column-gap: 42px;
   }
 
+
   .release-row {
     position: relative;
-    padding: 13px 0 15px;
-    border-bottom: 1px solid color-mix(in srgb, var(--accent) 38%, transparent);
+
+    padding:
+      13px 0 15px;
+
+    border-bottom:
+      1px solid
+      color-mix(
+        in srgb,
+        var(--accent) 38%,
+        transparent
+      );
+
     break-inside: avoid;
   }
 
+
   .release-row:nth-child(4n + 1)::before {
     content: "";
+
     position: absolute;
+
     left: -10px;
     top: 13px;
     bottom: 13px;
+
     width: 3px;
-    background: var(--accent);
-    transform: rotate(1.5deg);
+
+    background:
+      var(--accent);
+
+    transform:
+      rotate(1.5deg);
   }
 
+
   .artist {
-    font-family: {% if font_files.condensed %}"OMW Condensed",{% endif %} {{ typography.condensed_fallback }};
-    font-size: {{ release_font_px }}px;
+    font-family:
+      {% if font_files.condensed %}
+      "OMW Condensed",
+      {% endif %}
+      {{ typography.condensed_fallback }};
+
+    font-size:
+      {{ release_font_px }}px;
+
     font-weight: 900;
     line-height: 1;
+
     text-transform: uppercase;
   }
 
+
   .title {
     margin-top: 5px;
-    color: color-mix(in srgb, var(--paper) 88%, var(--muted));
-    font-size: {{ release_title_font_px }}px;
+
+    color:
+      color-mix(
+        in srgb,
+        var(--paper) 88%,
+        var(--muted)
+      );
+
+    font-size:
+      {{ release_title_font_px }}px;
+
     font-style: italic;
     line-height: 1.08;
   }
 
-  .slide.releases-2 .rule { width: 72%; }
-  .slide.releases-3 .rule { width: 88%; margin-left: 7%; }
+
+  .slide.releases-2 .rule {
+    width: 72%;
+  }
+
+
+  .slide.releases-3 .rule {
+    width: 88%;
+    margin-left: 7%;
+  }
+
+
+  /*
+    Main Singles stamp.
+  */
   .slide.releases-3 h1 {
     display: inline-block;
-    color: var(--bg);
-    background: var(--accent);
-    padding: 8px 18px 12px;
-    transform: rotate(-.7deg);
+
+    color:
+      var(--bg);
+
+    background:
+      var(--accent);
+
+    padding:
+      8px 18px 12px;
+
+    transform:
+      rotate(-.7deg);
+
     text-shadow: none;
   }
 
-  /* ---------- SUPPORT SLIDE ---------- */
+
+  /*
+    SINGLES CONT. is considerably longer than
+    SINGLES, so use a smaller font and tighter
+    padding to keep it away from the date badge.
+  */
+  .slide.releases-3 h1.cont-heading {
+    font-size: 76px;
+
+    letter-spacing: -2px;
+
+    padding:
+      6px 13px 9px;
+
+    line-height: .88;
+  }
+
+
+  /* =========================================================
+     SUPPORT SLIDE
+     ========================================================= */
 
   .support {
     height: 795px;
+
     display: flex;
     flex-direction: column;
     justify-content: center;
   }
 
+
   .support-lead {
     max-width: 850px;
-    font-family: {% if font_files.display %}"OMW Display",{% endif %} {{ typography.display_fallback }};
+
+    font-family:
+      {% if font_files.display %}
+      "OMW Display",
+      {% endif %}
+      {{ typography.display_fallback }};
+
     font-size: 92px;
     font-weight: 900;
     letter-spacing: -1px;
     line-height: .9;
+
     text-transform: uppercase;
   }
+
 
   .support-lead .accent {
     display: inline-block;
-    color: var(--bg);
-    background: var(--accent);
-    padding: 0 13px 6px;
-    {% if effects.rotations.enabled %}transform: rotate({{ effects.rotations.support_stamp_deg }}deg);{% endif %}
+
+    color:
+      var(--bg);
+
+    background:
+      var(--accent);
+
+    padding:
+      0 13px 6px;
+
+    {% if effects.rotations.enabled %}
+    transform:
+      rotate(
+        {{ effects.rotations.support_stamp_deg }}deg
+      );
+    {% endif %}
   }
+
 
   .support-grid {
     margin-top: 58px;
+
     display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 28px 42px;
+
+    grid-template-columns:
+      repeat(2, 1fr);
+
+    gap:
+      28px 42px;
   }
+
 
   .support-item {
     position: relative;
-    padding: 18px 0 18px 22px;
-    border-left: 5px solid var(--accent);
+
+    padding:
+      18px 0 18px 22px;
+
+    border-left:
+      5px solid var(--accent);
   }
 
-  .support-item:nth-child(2), .support-item:nth-child(3) {
-    transform: translateX(8px);
+
+  .support-item:nth-child(2),
+  .support-item:nth-child(3) {
+    transform:
+      translateX(8px);
   }
+
 
   .support-item strong {
     display: block;
-    font-family: {% if font_files.condensed %}"OMW Condensed",{% endif %} {{ typography.condensed_fallback }};
+
+    font-family:
+      {% if font_files.condensed %}
+      "OMW Condensed",
+      {% endif %}
+      {{ typography.condensed_fallback }};
+
     font-size: 35px;
     line-height: 1;
+
     text-transform: uppercase;
   }
+
 
   .support-item span {
     display: block;
+
     margin-top: 7px;
-    color: var(--muted);
+
+    color:
+      var(--muted);
+
     font-size: 23px;
     line-height: 1.15;
+
     text-transform: uppercase;
   }
+
+
+  /* =========================================================
+     FOOTER
+     ========================================================= */
 
   .footer {
     position: absolute;
+
     left: 0;
     right: 0;
     bottom: 8px;
+
     display: flex;
-    justify-content: space-between;
+
+    justify-content:
+      space-between;
+
     gap: 20px;
-    border-top: 3px solid var(--accent);
+
+    border-top:
+      3px solid var(--accent);
+
     padding-top: 12px;
-    font-family: {% if font_files.condensed %}"OMW Condensed",{% endif %} {{ typography.condensed_fallback }};
+
+    font-family:
+      {% if font_files.condensed %}
+      "OMW Condensed",
+      {% endif %}
+      {{ typography.condensed_fallback }};
+
     font-size: 21px;
     font-weight: 900;
     letter-spacing: .8px;
+
     text-transform: uppercase;
   }
 
+
   .page {
-    color: var(--bg);
-    background: var(--accent);
-    padding: 2px 8px;
-    transform: rotate(-1deg);
+    color:
+      var(--bg);
+
+    background:
+      var(--accent);
+
+    padding:
+      2px 8px;
+
+    transform:
+      rotate(-1deg);
   }
+
 </style>
 </head>
+
+
 <body>
+
 <div class="slide {{ slide_class }} {% if background_image %}has-bg{% endif %}">
+
   <div class="content">
+
+    <!-- HEADER -->
     <div class="topline">
+
       <div>
-        <div class="kicker">{{ kicker }}</div>
-        <h1>{{ heading }}</h1>
+
+        <div class="kicker">
+          {{ kicker }}
+        </div>
+
+        <h1 class="{% if 'CONT.' in heading %}cont-heading{% endif %}">
+          {{ heading }}
+        </h1>
+
       </div>
+
       <div class="week">
-        {{ week_line_1 }}<br>{{ week_line_2 }}
+        {{ week_line_1 }}<br>
+        {{ week_line_2 }}
       </div>
+
     </div>
+
 
     <div class="rule"></div>
 
+
+    <!-- =====================================================
+         LIVE SHOWS
+         ===================================================== -->
+
     {% if kind == "shows" %}
+
       <div class="shows">
+
         {% for group in day_groups %}
+
           <div class="day-group">
-            <div class="date">{{ group.day }}<br>{{ group.short_date }}</div>
+
+            <div class="date">
+              {{ group.day }}<br>
+              {{ group.short_date }}
+            </div>
+
+
             <div>
+
               {% for item in group.events %}
+
                 <div class="event">
-                  <div class="bands">{{ item.bands_display }}</div>
+
+                  <div class="bands">
+                    {{ item.bands_display }}
+                  </div>
+
 
                   <div class="event-meta">
-                    <div class="venue">@ {{ item.venue }}</div>
+
+                    <div class="venue">
+                      @ {{ item.venue }}
+                    </div>
+
 
                     {% if item.notation %}
-                      <div class="notation">{{ item.notation }}</div>
+
+                      <div class="notation-wrap">
+
+                        <div class="notation">
+                          {{ item.notation }}
+                        </div>
+
+                      </div>
+
                     {% endif %}
+
                   </div>
+
                 </div>
+
               {% endfor %}
+
             </div>
+
           </div>
+
         {% endfor %}
+
       </div>
+
+
+    <!-- =====================================================
+         RELEASES
+         ===================================================== -->
 
     {% elif kind == "releases" %}
+
       <div class="release-wrap">
-        {% if effects.release_watermark.enabled %}<div class="release-watermark">{{ watermark }}</div>{% endif %}
+
+        {% if effects.release_watermark.enabled %}
+
+          <div class="release-watermark">
+            {{ watermark }}
+          </div>
+
+        {% endif %}
+
+
         <div class="release-grid">
+
           {% for item in items %}
+
             <div class="release-row">
-              <div class="artist">{{ item.artist }}</div>
-              <div class="title">{{ item.title }}</div>
+
+              <div class="artist">
+                {{ item.artist }}
+              </div>
+
+              <div class="title">
+                {{ item.title }}
+              </div>
+
             </div>
+
           {% endfor %}
+
         </div>
+
       </div>
+
+
+    <!-- =====================================================
+         SUPPORT
+         ===================================================== -->
 
     {% elif kind == "support" %}
+
       <div class="support">
+
         <div class="support-lead">
-          KEEP <span class="accent">OKC HEAVY</span><br>AND KEEP IT LOCAL.
+
+          KEEP
+
+          <span class="accent">
+            OKC HEAVY
+          </span>
+
+          <br>
+
+          AND KEEP IT LOCAL.
+
         </div>
+
+
         <div class="support-grid">
+
           <div class="support-item">
-            <strong>GO TO SHOWS</strong>
-            <span>Even when you only know one band.</span>
+
+            <strong>
+              GO TO SHOWS
+            </strong>
+
+            <span>
+              Even when you only know one band.
+            </span>
+
           </div>
+
+
           <div class="support-item">
-            <strong>BUY EARLY</strong>
-            <span>Presales help bands, promoters, and venues.</span>
+
+            <strong>
+              BUY EARLY
+            </strong>
+
+            <span>
+              Presales help bands, promoters, and venues.
+            </span>
+
           </div>
+
+
           <div class="support-item">
-            <strong>SUPPORT VENUES</strong>
-            <span>Spend a few bucks while you're there.</span>
+
+            <strong>
+              SUPPORT VENUES
+            </strong>
+
+            <span>
+              Spend a few bucks while you're there.
+            </span>
+
           </div>
+
+
           <div class="support-item">
-            <strong>BRING A FRIEND</strong>
-            <span>Turn somebody onto a band they haven't heard.</span>
+
+            <strong>
+              BRING A FRIEND
+            </strong>
+
+            <span>
+              Turn somebody onto a band they haven't heard.
+            </span>
+
           </div>
+
         </div>
+
       </div>
+
     {% endif %}
 
-    <!-- <div class="footer">
-      <div>{{ footer }}</div>
-      <div class="page">{{ page_num }}/{{ page_total }}</div>
-    </div> -->
+
+    <!--
+    <div class="footer">
+
+      <div>
+        {{ footer }}
+      </div>
+
+      <div class="page">
+        {{ page_num }}/{{ page_total }}
+      </div>
+
+    </div>
+    -->
+
   </div>
 
-  {% if effects.vignette.enabled %}<div class="vignette"></div>{% endif %}
-  {% if effects.grain.enabled %}<div class="grain"></div>{% endif %}
-  {% if effects.static.enabled %}<div class="static"></div>{% endif %}
+
+  {% if effects.vignette.enabled %}
+    <div class="vignette"></div>
+  {% endif %}
+
+  {% if effects.grain.enabled %}
+    <div class="grain"></div>
+  {% endif %}
+
+  {% if effects.static.enabled %}
+    <div class="static"></div>
+  {% endif %}
+
 </div>
+
 </body>
 </html>
