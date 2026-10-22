@@ -28,7 +28,7 @@ jobs:
 
       - name: Install Chromium
         run: |
-          playwright install --with-deps chromium
+          playwright install chromium
 
       - name: Create Google credentials
         env:
