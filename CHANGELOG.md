@@ -6,18 +6,23 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+## [0.5.0] - 2026-10-26
+
 ### Added
-- Support for optional show notations, allowing promoters and special announcements to be highlighted.
-- Automatic pagination for Singles when the release list exceeds one slide.
+- Historical architecture documentation and ADR-0001.
+- Automated pytest tests covering core data transformations.
+- GitHub Actions CI for pushes and pull requests.
+- Development dependency configuration.
+- Support for optional show notations.
+- Automatic pagination for Singles.
 
 ### Changed
-- Improved placement of the date badge for Instagram visibility.
-- Improved venue and notation layout to reduce overlapping labels.
-- Extended the configurable publication window to 11 days (Thursday to the next Sunday).
+- Improved date badge and notation placement.
+- Extended the configurable publication window.
 
 ### Fixed
-- Long notation labels overlapping other show information.
-- Singles overflowing a single slide instead of generating additional pages.
+- Overlapping show notation labels.
+- Singles overflowing a single slide.
 
 ## [0.4.0] - Historical release
 
@@ -40,5 +45,6 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - Earlier development versions were not formally tagged.
 - The v0.4 architecture will be documented separately.
 
-[Unreleased]: https://github.com/erikvvargas/okc-metal-weekly/compare/v0.4.0...HEAD
+[Unreleased]: https://github.com/erikvvargas/okc-metal-weekly/compare/v0.5.0...HEAD
+[0.5.0]: https://github.com/erikvvargas/okc-metal-weekly/compare/v0.4.0...v0.5.0
 [0.4.0]: https://github.com/erikvvargas/okc-metal-weekly/releases/tag/v0.4.0
