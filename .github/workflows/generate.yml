@@ -10,7 +10,7 @@ on:
 
 jobs:
   generate:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
 
     steps:
       - name: Checkout repository
@@ -28,7 +28,7 @@ jobs:
 
       - name: Install Chromium
         run: |
-          playwright install --with-deps chromium
+          playwright install chromium
 
       - name: Create Google credentials
         env:
