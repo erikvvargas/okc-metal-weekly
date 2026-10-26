@@ -4,3 +4,4 @@ output/
 service-account.json
 *.pyc
 .pytest_cache/
+.vscode/
