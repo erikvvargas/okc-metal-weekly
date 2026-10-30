@@ -276,6 +276,236 @@ def choose_show_sizes(groups, cfg):
     )
 
 
+def split_show_pages(browser, env, cfg, groups, common):
+    """
+    Paginate shows using Chromium's actual rendered layout.
+
+    - Keep complete events together when possible.
+    - Keep consecutive festival days together when they fit.
+    - Split oversized events between individual bands.
+    """
+    import re
+
+    def festival_key(group):
+        if len(group["events"]) != 1:
+            return None
+
+        note = group["events"][0].get("notation", "")
+        match = re.match(
+            r"^(.*?)\s+DAY\s+\d+\b",
+            note,
+            re.I,
+        )
+
+        return (
+            match.group(1).strip().casefold()
+            if match else None
+        )
+
+    page = browser.new_page(
+        viewport={
+            "width": cfg["canvas"]["width"],
+            "height": cfg["canvas"]["height"],
+        }
+    )
+
+    template = env.get_template("slide.html")
+
+    def fits(groups_on_page):
+        html = template.render(
+            **cfg,
+            **common,
+            kind="shows",
+            slide_class="shows-1",
+            kicker="OKC METAL WEEKLY",
+            heading="LIVE NOISE",
+            day_groups=groups_on_page,
+            items=[],
+            watermark="",
+            footer="",
+            release_columns=1,
+            release_font_px=30,
+            release_title_font_px=22,
+            page_num=1,
+            page_total=1,
+        )
+
+        page.set_content(html, wait_until="load")
+        page.evaluate("() => document.fonts.ready")
+
+        return page.evaluate("""() => {
+            const root = document.querySelector('.slide');
+            const content = document.querySelector('.shows');
+            const nodes = [
+                ...document.querySelectorAll(
+                    '.day-group, .event, .bands, .event-meta'
+                )
+            ];
+
+            const rect = root.getBoundingClientRect();
+            const bottom = rect.bottom - 55;
+
+            return (
+                content.getBoundingClientRect().bottom <= bottom &&
+                nodes.every(n => {
+                    const r = n.getBoundingClientRect();
+                    return (
+                        r.bottom <= bottom &&
+                        r.right <= rect.right - 45
+                    );
+                })
+            );
+        }""")
+
+    def split_event(group, event):
+        """Split an oversized lineup at band boundaries."""
+        bands = event["bands_display"].split(" • ")
+        chunks = []
+        current = []
+
+        for band in bands:
+            candidate = current + [band]
+            trial_event = {
+                **event,
+                "bands_display": " • ".join(candidate),
+            }
+            trial_group = {
+                **group,
+                "events": [trial_event],
+            }
+
+            if current and not fits([trial_group]):
+                chunks.append(current)
+                current = [band]
+            else:
+                current = candidate
+
+        if current:
+            chunks.append(current)
+
+        results = []
+
+        for index, chunk in enumerate(chunks):
+            notation = event.get("notation", "")
+
+            if index > 0:
+                notation = (
+                    f"{notation} CONT."
+                    if notation else "CONT."
+                )
+
+            piece = {
+                **event,
+                "bands_display": " • ".join(chunk),
+                "notation": notation,
+            }
+
+            result = {
+                **group,
+                "events": [piece],
+            }
+
+            if not fits([result]):
+                raise ValueError(
+                    "Show entry cannot fit on an empty slide: "
+                    + piece["bands_display"]
+                )
+
+            results.append(result)
+
+        return results
+
+    # Build atomic units: one complete event per unit.
+    units = []
+
+    for group in groups:
+        for event in group["events"]:
+            single = {
+                **group,
+                "events": [event],
+            }
+
+            if fits([single]):
+                units.append(single)
+            else:
+                units.extend(split_event(group, event))
+
+    # Detect adjacent festival days by notation.
+    # Example: FLYOVER FEST DAY 1 / FLYOVER FEST DAY 2
+    bundles = []
+    i = 0
+
+    while i < len(units):
+        current = units[i]
+        key = festival_key(current)
+
+        if key and i + 1 < len(units):
+            following = units[i + 1]
+
+            if (
+                festival_key(following) == key
+                and fits([current, following])
+            ):
+                bundles.append([current, following])
+                i += 2
+                continue
+
+        bundles.append([current])
+        i += 1
+
+    pages = []
+    current_page = []
+
+    for bundle in bundles:
+        if fits(current_page + bundle):
+            current_page.extend(bundle)
+            continue
+
+        if current_page:
+            pages.append(current_page)
+            current_page = []
+
+        if fits(bundle):
+            current_page.extend(bundle)
+        else:
+            for unit in bundle:
+                if not fits(current_page + [unit]):
+                    if current_page:
+                        pages.append(current_page)
+                    current_page = []
+
+                current_page.append(unit)
+
+    if current_page:
+        pages.append(current_page)
+
+    page.close()
+
+    # Recombine adjacent entries sharing a date so the
+    # template preserves its existing same-day styling.
+    merged_pages = []
+
+    for show_page in pages:
+        merged = []
+
+        for group in show_page:
+            if (
+                merged
+                and merged[-1]["date"] == group["date"]
+            ):
+                merged[-1]["events"].extend(group["events"])
+            else:
+                merged.append({
+                    **group,
+                    "events": list(group["events"]),
+                })
+
+        merged_pages.append(merged)
+
+    return merged_pages or [[]]
+
+
+
 def choose_release_sizes(items, cfg):
     n = len(items)
 
@@ -638,8 +868,9 @@ def main():
     # ---------------------------------
 
     slides = []
-
-    # Live shows
+    
+    # Live shows placeholder.
+    # Actual pagination happens after Chromium starts.
     slides.append(
         dict(
             kind="shows",
@@ -816,10 +1047,58 @@ def main():
     # Render
     # ---------------------------------
 
+    
     with sync_playwright() as p:
         browser = p.chromium.launch()
 
+        # Measure and paginate live shows.
+        show_pages = split_show_pages(
+            browser,
+            env,
+            cfg,
+            day_groups,
+            dict(
+                week_line_1=week_line_1,
+                week_line_2=week_line_2,
+                show_font_px=show_font,
+                show_venue_font_px=venue_font,
+                font_files=font_files,
+                background_image=background_image,
+            ),
+        )
+
+        # Replace the placeholder with actual show pages.
+        show_slide = slides[0]
+
+        slides = [
+            dict(
+                show_slide,
+                day_groups=groups,
+                heading=(
+                    "LIVE NOISE"
+                    if i == 0
+                    else "LIVE NOISE CONT."
+                ),
+            )
+            for i, groups in enumerate(show_pages)
+        ] + slides[1:]
+
+        # Recalculate slide numbers and release watermarks.
+        page_total = len(slides)
+
+        for page_num, slide in enumerate(slides, start=1):
+            slide["page_num"] = page_num
+
+            if slide["kind"] == "releases":
+                slide["watermark"] = f"{page_num:02d}"
+
+        print(
+            f"Show pages: {len(show_pages)} | "
+            f"Total slides: {page_total}"
+        )
+
         for slide in slides:
+
             html = render_html(
                 env,
                 cfg,
